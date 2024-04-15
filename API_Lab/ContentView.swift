@@ -19,6 +19,7 @@ struct User: Codable {
     public var url: String
     public var avatar_url:String
     public var html_url: String
+    public var dictionary : String
 }
 // the items array from the JSON
 struct Result: Codable {

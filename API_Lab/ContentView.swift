@@ -86,15 +86,23 @@ struct ContentView: View {
         guard !trimmedSearchText.isEmpty else {
             return
         }
-        if let apiURL = URL(string:"https://api.weather.gov/alerts/active/count"){
-            let task = URLSession.shared.dataTask(with: apiURL) {data, response, error in
-                if let error = error{
-                    
-                } else if let data = data, let response = response as? HTTPURLResponse{
-                    if response.statusCode == 200{
-                        
-                    }else {
-                        
+        if let apiURL = URL(string: "https://api.weather.gov/alerts/active/count") {
+            let task = URLSession.shared.dataTask(with: apiURL) { data, response, error in
+                if let error = error {
+                    print("Error: \(error.localizedDescription)")
+                } else if let data = data, let response = response as? HTTPURLResponse {
+                    if response.statusCode == 200 {
+                        do {
+                            let json = try JSONSerialization.jsonObject(with: data, options: [])
+                            if let dictionary = json as? [String: Any] {
+                                // Handle the JSON data here (e.g., extract relevant information)
+                                print(dictionary)
+                            }
+                        } catch {
+                            print("Error parsing JSON: \(error.localizedDescription)")
+                        }
+                    } else {
+                        print("HTTP status code: \(response.statusCode)")
                     }
                 }
             }
@@ -102,6 +110,7 @@ struct ContentView: View {
         }
     }
 }
+
 
 #Preview {
     ContentView()

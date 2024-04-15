@@ -14,23 +14,22 @@ import SwiftUI
 // NOTE that the variable names have to be exactly like in the JSON file
 
 //indivisual User from the json
-struct User: Codable {
-    public var login: String
-    public var url: String
-    public var avatar_url:String
-    public var html_url: String
+struct Weather: Codable {
+    public var areas: String
+    public var regions: String
+    public var dictionary: String
 }
 // the items array from the JSON
 struct Result: Codable {
-    var items:[User]
+    var items:[Weather]
 }
 
 struct ContentView: View {
-    @State var users:[User] = []
+    @State var states:[Weather] = []
     @State var searchText = ""
     var body: some View {
         NavigationStack{
-            if users.count == 0 && !searchText.isEmpty{
+            if states.count == 0 && !searchText.isEmpty{
                 //display a progress spinning wheel if no data has been pulled yet
                 VStack{
                     ProgressView().padding()
@@ -42,30 +41,11 @@ struct ContentView: View {
                 }
             } else {
                 // bind the list to the User array
-                List(users, id:\.login) {user in
+                List(states, id: \.areas) {state in
                     // links to their github profile using Safari
-                    Link(destination:URL(string:user.html_url)!){
-                        
-                        
-                        // diplay the image
-                        HStack(alignment:.top){
-                            AsyncImage(url:URL(string: user.avatar_url)){ response in
-                                switch response {
-                                case .success(let image):
-                                    image.resizable()
-                                        .frame(width:50, height: 50)
-                                default:
-                                    Image(systemName:"nosign")
-                                }
-                            }
-                        }
-                        
-                        // display the user info
-                        VStack(alignment: .leading){
-                            Text(user.login)
-                            Text("\(user.url)")
-                                .font(.system(size:11))
-                                .foregroundColor(Color.gray)
+                    Link(destination:URL(string:state.areas)!){
+                        VStack {
+                            Text("Alerts in State:" + state.areas)
                         }
                     }
                 }

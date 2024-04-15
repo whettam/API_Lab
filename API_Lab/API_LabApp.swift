@@ -1,14 +1,14 @@
 //
-//  API_LabApp.swift
-//  API_Lab
+//  apiappApp.swift
+//  apiapp
 //
-//  Created by BALLARD, MATTHEW J. on 4/15/24.
+//  Created by KIRSTEN Markley on 4/15/24.
 //
 
 import SwiftUI
 
 @main
-struct API_LabApp: App {
+struct apiappApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()

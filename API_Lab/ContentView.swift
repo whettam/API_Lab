@@ -86,18 +86,19 @@ struct ContentView: View {
         guard !trimmedSearchText.isEmpty else {
             return
         }
-        if let apiURL = URL(string:"https://api.github.com/search/users?q=\(trimmedSearchText)"){
-            var request = URLRequest(url:apiURL)
-            request.httpMethod = "GET"
-            URLSession.shared.dataTask(with: request){
-                data, response,error in
-                if let userData = data {
-                    if let usersFromAPI = try? JSONDecoder().decode(Result.self, from: userData){
-                        users = usersFromAPI.items
-                        print(users)
+        if let apiURL = URL(string:"https://api.weather.gov/alerts/active/count"){
+            let task = URLSession.shared.dataTask(with: apiURL) {data, response, error in
+                if let error = error{
+                    
+                } else if let data = data, let response = response as? HTTPURLResponse{
+                    if response.statusCode == 200{
+                        
+                    }else {
+                        
                     }
                 }
-            }.resume()
+            }
+            task.resume()
         }
     }
 }

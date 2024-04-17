@@ -34,10 +34,24 @@ struct AlertDetailsView: View {
     }
 }
 
+
 struct ContentView: View {
     @State var alertResponse: AlertResponse?
     @State var searchText = ""
     
+    let states = Array(alertResponse?.areas.keys ?? [])
+    
+    var filteredStates: [String] {
+        if searchText.isEmpty {
+            return states
+        }
+        else {
+            return states.filter {
+                $0.localizedCaseInsensitiveContains(searchText)
+            }
+        }
+    }
+        
     var body: some View {
         NavigationView {
             VStack {
@@ -51,9 +65,13 @@ struct ContentView: View {
                     List(alertResponse?.areas.sorted(by: { $0.key < $1.key }) ?? [], id: \.key) { state, count in
                         NavigationLink(destination: AlertDetailsView(state: state, count: count)) {
                             VStack(alignment: .leading) {
-                                Text((state))                           
+                                Text(state)
                             }
                         }
+                    }
+                    List(filteredStates, id: \.self) {
+                        item in
+                        Text(item)
                     }
                 }
             }

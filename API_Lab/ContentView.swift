@@ -21,6 +21,18 @@ struct AlertResponse: Codable {
     var total: Int
     var marine: Int
 }
+struct AlertDetailsView: View {
+    let state: String
+    let count: Int
+    
+    var body: some View {
+        VStack {
+            Text("Alerts in State: \(state)")
+            Text("Count: \(count)")
+        }
+        .navigationTitle("Alert Details")
+    }
+}
 
 struct ContentView: View {
     @State var alertResponse: AlertResponse?
@@ -37,7 +49,7 @@ struct ContentView: View {
                         }
                 } else {
                     List(alertResponse?.areas.sorted(by: { $0.key < $1.key }) ?? [], id: \.key) { state, count in
-                        NavigationLink(destination: Text("Alerts in State: \(state), Count: \(count)")) {
+                        NavigationLink(destination: AlertDetailsView(state: state, count: count)) {
                             VStack(alignment: .leading) {
                                 Text((state))                           
                             }

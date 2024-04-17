@@ -39,8 +39,7 @@ struct ContentView: View {
                     List(alertResponse?.areas.sorted(by: { $0.key < $1.key }) ?? [], id: \.key) { state, count in
                         NavigationLink(destination: Text("Alerts in State: \(state), Count: \(count)")) {
                             VStack(alignment: .leading) {
-                                Text("State: \(state)")
-                                Text("Alert Count: \(count)")
+                                Text((state))                           
                             }
                         }
                     }

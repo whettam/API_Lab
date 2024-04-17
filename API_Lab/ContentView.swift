@@ -13,85 +13,67 @@ import SwiftUI
 // Structs will contain the information returned from the JSON
 // NOTE that the variable names have to be exactly like in the JSON file
 
-//indivisual User from the json
-struct Weather: Codable {
-    public var areas: String
-    public var regions: String
-    public var dictionary: String
-}
-// the items array from the JSON
-struct Result: Codable {
-    var items:[Weather]
+struct AlertResponse: Codable {
+    var regions: [String: Int]
+    var land: Int
+    var zones: [String: Int]
+    var areas: [String: Int]
+    var total: Int
+    var marine: Int
 }
 
 struct ContentView: View {
-    @State var states:[Weather] = []
+    @State var alertResponse: AlertResponse?
     @State var searchText = ""
+    
     var body: some View {
-        NavigationStack{
-            if states.count == 0 && !searchText.isEmpty{
-                //display a progress spinning wheel if no data has been pulled yet
-                VStack{
-                    ProgressView().padding()
-                    Text("Fetching Users...")
-                        .foregroundStyle(Color.purple)
-                        .onAppear{
+        NavigationView {
+            VStack {
+                if alertResponse == nil {
+                    ProgressView()
+                        .padding()
+                        .onAppear {
                             getUsers()
                         }
-                }
-            } else {
-                // bind the list to the User array
-                List(states, id: \.areas) {state in
-                    // links to their github profile using Safari
-                    Link(destination:URL(string:state.areas)!){
-                        VStack {
-                            Text("Alerts in State:" + state.areas)
+                } else {
+                    List(alertResponse?.areas.sorted(by: { $0.key < $1.key }) ?? [], id: \.key) { state, count in
+                        NavigationLink(destination: Text("Alerts in State: \(state), Count: \(count)")) {
+                            VStack(alignment: .leading) {
+                                Text("State: \(state)")
+                                Text("Alert Count: \(count)")
+                            }
                         }
                     }
                 }
             }
-        }.searchable(text:$searchText)
-            .onSubmit(of: .search){
-                getUsers()
-            }
+            .navigationTitle("Alerts by State")
+            .searchable(text: $searchText)
+        }
     }
     
-    // fetches the Users from the github api
-    
-    func getUsers(){
-        // Add Search content
-        let trimmedSearchText = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        //Proceed only if searchText is not empty or just whitespace
-        guard !trimmedSearchText.isEmpty else {
-            return
-        }
-        if let apiURL = URL(string: "https://api.weather.gov/alerts/active/count") {
-            let task = URLSession.shared.dataTask(with: apiURL) { data, response, error in
-                if let error = error {
-                    print("Error: \(error.localizedDescription)")
-                } else if let data = data, let response = response as? HTTPURLResponse {
-                    if response.statusCode == 200 {
-                        do {
-                            let json = try JSONSerialization.jsonObject(with: data, options: [])
-                            if let dictionary = json as? [String: Any] {
-                                // Handle the JSON data here (e.g., extract relevant information)
-                                print(dictionary)
-                            }
-                        } catch {
-                            print("Error parsing JSON: \(error.localizedDescription)")
-                        }
-                    } else {
-                        print("HTTP status code: \(response.statusCode)")
+    func getUsers() {
+        guard let apiURL = URL(string: "https://api.weather.gov/alerts/active/count") else { return }
+        let task = URLSession.shared.dataTask(with: apiURL) { data, response, error in
+            if let error = error {
+                print("Error: \(error.localizedDescription)")
+            } else if let data = data {
+                do {
+                    let decoder = JSONDecoder()
+                    let response = try decoder.decode(AlertResponse.self, from: data)
+                    DispatchQueue.main.async {
+                        self.alertResponse = response
                     }
+                } catch {
+                    print("Error decoding JSON: \(error.localizedDescription)")
                 }
             }
-            task.resume()
         }
+        task.resume()
     }
 }
 
-
-#Preview {
-    ContentView()
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
 }

@@ -6,13 +6,8 @@
 //
 
 import SwiftUI
-// API url  https://api.github.com/search/users?q=greg
-
-// Both structs use Codable so that we can passs them to the JSON Decord to decode the JSON response string back into the structs
 
 // Structs will contain the information returned from the JSON
-// NOTE that the variable names have to be exactly like in the JSON file
-
 struct AlertResponse: Codable {
     var regions: [String: Int]
     var land: Int
@@ -21,6 +16,7 @@ struct AlertResponse: Codable {
     var total: Int
     var marine: Int
 }
+
 struct AlertDetailsView: View {
     let state: String
     let count: Int
@@ -34,24 +30,22 @@ struct AlertDetailsView: View {
     }
 }
 
-
 struct ContentView: View {
-    @State var alertResponse: AlertResponse?
-    @State var searchText = ""
+    @State private var alertResponse: AlertResponse?
+    @State private var searchText = ""
     
-    let states = Array(alertResponse?.areas.keys ?? [])
-    
-    var filteredStates: [String] {
+    private var filteredStates: [String] {
+        guard let alertResponse = alertResponse else { return [] }
+        
         if searchText.isEmpty {
-            return states
-        }
-        else {
-            return states.filter {
+            return alertResponse.areas.keys.sorted()
+        } else {
+            return alertResponse.areas.keys.sorted().filter {
                 $0.localizedCaseInsensitiveContains(searchText)
             }
         }
     }
-        
+    
     var body: some View {
         NavigationView {
             VStack {
@@ -62,17 +56,16 @@ struct ContentView: View {
                             getUsers()
                         }
                 } else {
-                    List(alertResponse?.areas.sorted(by: { $0.key < $1.key }) ?? [], id: \.key) { state, count in
-                        NavigationLink(destination: AlertDetailsView(state: state, count: count)) {
-                            VStack(alignment: .leading) {
-                                Text(state)
+                    List(filteredStates, id: \.self) { state in
+                        if let count = alertResponse?.areas[state] {
+                            NavigationLink(destination: AlertDetailsView(state: state, count: count)) {
+                                VStack(alignment: .leading) {
+                                    Text(state)
+                                }
                             }
                         }
                     }
-                    List(filteredStates, id: \.self) {
-                        item in
-                        Text(item)
-                    }
+                    .listStyle(InsetGroupedListStyle())
                 }
             }
             .navigationTitle("Alerts by State")
@@ -80,7 +73,7 @@ struct ContentView: View {
         }
     }
     
-    func getUsers() {
+    private func getUsers() {
         guard let apiURL = URL(string: "https://api.weather.gov/alerts/active/count") else { return }
         let task = URLSession.shared.dataTask(with: apiURL) { data, response, error in
             if let error = error {

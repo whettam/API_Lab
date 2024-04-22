@@ -77,11 +77,12 @@ struct ContentView: View {
                             Text("Alerts by State")
                                 .font(.title)
                                 .fontWeight(.bold)
-                                .padding(.top)
+                                .padding(.top,43)
                             Text("According to the National Weather Service")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
-                                .padding(.bottom)
+                                .padding(.bottom, 50)
+                                
                         }
                         Spacer()
                     }

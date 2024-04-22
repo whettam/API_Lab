@@ -68,7 +68,25 @@ struct ContentView: View {
                     .listStyle(InsetGroupedListStyle())
                 }
             }
-            .navigationTitle("Alerts by State")
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text("Alerts by State")
+                                .font(.title)
+                                .fontWeight(.bold)
+                                .padding(.top)
+                            Text("According to the National Weather Service")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .padding(.bottom)
+                        }
+                        Spacer()
+                    }
+                }
+            }
             .searchable(text: $searchText)
         }
     }
